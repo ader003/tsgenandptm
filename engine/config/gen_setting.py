@@ -8,7 +8,7 @@ import os
 from .util import write_config
 
 
-def get_generative():
+def get_generative(config_dir):
     config_dict = {}
     config_dict['model'] = {}
     config_dict['model']['name'] = 'diffusion'
@@ -22,8 +22,10 @@ def get_generative():
     config_dict['model']['batch_size'] = 32
     config_dict['model']['lr'] = 0.0001
 
+    # config_path = os.path.join(
+    #     '.', 'config', 'gen_diff_00.config')
     config_path = os.path.join(
-        '.', 'config', 'gen_diff_00.config')
+        config_dir, 'gen_diff_00.config')
     write_config(config_dict, config_path)
 
     config_dict = {}
@@ -37,8 +39,10 @@ def get_generative():
     config_dict['model']['batch_size'] = 32
     config_dict['model']['lr'] = 0.0001
 
+    # config_path = os.path.join(
+        # '.', 'config', 'gen_bvae_00.config')
     config_path = os.path.join(
-        '.', 'config', 'gen_bvae_00.config')
+        config_dir, 'gen_bvae_00.config')
     write_config(config_dict, config_path)
 
     config_dict = {}
@@ -51,7 +55,9 @@ def get_generative():
     config_dict['model']['batch_size'] = 32
     config_dict['model']['lr'] = 0.0001
 
+    # config_path = os.path.join(
+        # '.', 'config', 'gen_gan_00.config')
     config_path = os.path.join(
-        '.', 'config', 'gen_gan_00.config')
+        config_dir, 'gen_gan_00.config')
     write_config(config_dict, config_path)
 

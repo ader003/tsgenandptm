@@ -6,12 +6,9 @@
 
 import torch
 from .classifier_0 import Classifier
-from .classifier_ttl_0 import ClassifierTTL
-from .stitch_simp_0 import StitchSimp
 from .time_freq_0 import TimeFreqEncoder
 from .ts2vec_enc_0 import TS2VecEncoder
 from .mixup_enc_0 import MixingUpEncoder
-from .simclr_enc_0 import SimCLREncoder
 from .timeclr_enc_0 import TimeCLREncoder
 from .resnet1d_1 import ResNet1D as ResNet1D_1
 from .rnnet_0 import RNNet
@@ -146,14 +143,6 @@ def get_mixup(model_config, encoder, force_init=False):
     return encoder_
 
 
-def get_simclr(model_config, encoder, force_init=False):
-    encoder_ = SimCLREncoder(encoder)
-    if not force_init:
-        encoder_ = load_pretrain(
-            model_config['simclr'], encoder_)
-    return encoder_
-
-
 def get_timeclr(model_config, encoder, force_init=False):
     aug_bank_ver = int(model_config['timeclr']['aug_bank_ver'])
     if aug_bank_ver == 0:
@@ -175,20 +164,6 @@ def get_timeclr(model_config, encoder, force_init=False):
         encoder_ = load_pretrain(
             model_config['timeclr'], encoder_)
     return encoder_
-
-
-# def get_tst(model_config, encoder, force_init=False):
-#     encoder_ = TSTEncoder(encoder)
-#     if not force_init:
-#         encoder_ = load_pretrain(model_config['tst'], encoder_)
-#     return encoder_
-
-
-# def get_cost(model_config, encoder, force_init=False):
-#     encoder_ = CoSTEncoder(encoder)
-#     if not force_init:
-#         encoder_ = load_pretrain(model_config['cost'], encoder_)
-#     return encoder_
 
 
 def get_encoder(model_name, model_config, force_init=False, encoder_only=False):
@@ -224,10 +199,6 @@ def get_encoder(model_name, model_config, force_init=False, encoder_only=False):
         # print('  get mixup')
         encoder = get_mixup(
             model_config, encoder, force_init=force_init)
-    elif 'simclr' in model_name:
-        # print('  get simclr')
-        encoder = get_simclr(
-            model_config, encoder, force_init=force_init)
     elif 'timeclr' in model_name:
         # print('  get timeclr')
         encoder = get_timeclr(
@@ -243,16 +214,6 @@ def get_classifier(model_config, encoder):
         encoder, n_class, n_dim=n_dim, n_layer=n_layer)
     return model
 
-
-def get_classifier_ttl(model_config, encoder):
-    n_class = int(model_config['classifttl']['n_class'])
-    n_dim = int(model_config['classifttl']['n_dim'])
-    n_layer = int(model_config['classifttl']['n_layer'])
-    model = ClassifierTTL(
-        encoder, n_class, n_dim=n_dim, n_layer=n_layer)
-    return model
-
-
 def get_model(model_config, encoder_only=False):
     model_name = model_config['model']['model_name']
     print(f'get model for {model_name}')
@@ -265,24 +226,12 @@ def get_model(model_config, encoder_only=False):
     
     if encoder_only:
         return encoder
-
-    if 'stichsimp' in model_name:
-        print('  get stichsimp')
-        encoder_ = get_encoder(
-            model_name, model_config, force_init=True)
-        encoder = StitchSimp(encoder, encoder_)
-        in_dim = int(model_config['in_dim'])
-        if encoder.in_dim != in_dim:
-            encoder.expand_dim(in_dim)
             
     if 'classifier' in model_name:
         print('  get classifier')
         model_config['classifier']['n_class'] = model_config['n_class']
         model = get_classifier(model_config, encoder)
-    elif 'classifttl' in model_name: 
-        print('  get classifier_ttl')
-        model_config['classifttl']['n_class'] = model_config['n_class']
-        model = get_classifier_ttl(model_config, encoder)
+
     else:
         model = encoder
     return model
